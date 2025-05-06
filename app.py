@@ -1,30 +1,23 @@
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
+import config
 
 app = Flask(__name__)
+app.config.from_object(config)
 
 mysql = MySQL(app)
 
 @app.route('/')
 def index():
     return "Task Manager API is running and connected to MySQL!"
-
-from flask import Flask, request, jsonify
-from flask_mysqldb import MySQL
-
-app = Flask(__name__)
-
-# MySQL configuration
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'your_mysql_user'
-app.config['MYSQL_PASSWORD'] = 'your_mysql_password'
-app.config['MYSQL_DB'] = 'taskmanager'
-
-mysql = MySQL(app)
-
-@app.route('/')
-def index():
-    return "Task Manager API is running and connected to MySQL!"
+@app.route('/test-db')
+def test_db():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT 1")
+        return "Database connection successful"
+    except Exception as e:
+        return f"Database connection failed: {e}"
 
 # Create a new task
 @app.route('/tasks', methods=['POST'])
