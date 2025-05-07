@@ -56,5 +56,18 @@ def get_tasks():
 
     return jsonify(tasks)
 
+# Fetch a specific task
+@app.route('/tasks/<int:id>', methods=['GET'])
+def get_task(id):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT id, title FROM tasks WHERE id = %s", (id,))
+    task = cur.fetchone()
+    cur.close()
+
+    if task:
+        return jsonify({'id': task[0], 'title': task[1]})
+    else:
+        return jsonify({'error': 'Task not found'}), 404
+
 if __name__ == '__main__':
     app.run(debug=True)
