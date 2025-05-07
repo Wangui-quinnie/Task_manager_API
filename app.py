@@ -10,6 +10,8 @@ mysql = MySQL(app)
 @app.route('/')
 def index():
     return "Task Manager API is running and connected to MySQL!"
+
+# Test database connection
 @app.route('/test-db')
 def test_db():
     try:
@@ -34,6 +36,25 @@ def create_task():
     cur.close()
 
     return jsonify({'message': 'Task created successfully!'}), 201
+
+# Fetch all tasks
+@app.route('/tasks', methods=['GET'])
+def get_tasks():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT id, title, completed FROM tasks")
+    rows = cur.fetchall()
+    cur.close()
+
+    tasks = []
+    for row in rows:
+        task = {
+            'id': row[0],
+            'title': row[1],
+            'completed': bool(row[2])
+        }
+        tasks.append(task)
+
+    return jsonify(tasks)
 
 if __name__ == '__main__':
     app.run(debug=True)
