@@ -89,6 +89,20 @@ def update_task(id):
 
     return jsonify({'message': 'Task updated successfully'})
 
+# Delete task
+@app.route('/tasks/<int:id>', methods=['DELETE'])
+def delete_task(id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM tasks WHERE id = %s", (id,))
+    mysql.connection.commit()
+    affected_rows = cur.rowcount
+    cur.close()
+
+    if affected_rows == 0:
+        return jsonify({'error': 'Task not found'}), 404
+
+    return jsonify({'message': 'Task deleted successfully'})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
