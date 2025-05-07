@@ -69,5 +69,26 @@ def get_task(id):
     else:
         return jsonify({'error': 'Task not found'}), 404
 
+# Update a task
+@app.route('/tasks/<int:id>', methods=['PUT'])
+def update_task(id):
+    data = request.get_json()
+    new_title = data.get('title')
+
+    if not new_title:
+        return jsonify({'error': 'Title is required'}), 400
+
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE tasks SET title = %s WHERE id = %s", (new_title, id))
+    mysql.connection.commit()
+    affected_rows = cur.rowcount
+    cur.close()
+
+    if affected_rows == 0:
+        return jsonify({'error': 'Task not found'}), 404
+
+    return jsonify({'message': 'Task updated successfully'})
+
+
 if __name__ == '__main__':
     app.run(debug=True)
