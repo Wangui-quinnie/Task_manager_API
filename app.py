@@ -126,7 +126,7 @@ def create_task(current_user_id):
 def get_tasks(current_user_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT id, title, completed FROM tasks WHERE user_id = %s", (current_user_id,))
-    rows = cur.fetchall()
+    tasks = cur.fetchall()
     cur.close()
 
     return jsonify([{'id': task[0], 'title': task[1]} for task in tasks])
@@ -166,10 +166,10 @@ def update_task(current_user_id, id):
 # Delete task
 @app.route('/tasks/<int:id>', methods=['DELETE'])
 @token_required
-def delete_task(current_user, id):
+def delete_task(current_user_id, id):
     cur = mysql.connection.cursor()
     # Ensure the task belongs to the logged-in user
-    cur.execute("SELECT * FROM tasks WHERE id = %s AND user_id = %s", (id, current_user['id']))
+    cur.execute("SELECT * FROM tasks WHERE id = %s AND user_id = %s", (id, current_user_id))
     task = cur.fetchone()
 
     if not task:
